@@ -1,0 +1,22 @@
+# US large-cap equities — symbols only, no data.
+symbols:
+  - canonical: "AAPL"
+    providers: {yfinance: "AAPL", stooq: "AAPL.US", alphavantage: "AAPL", tiingo: "AAPL", twelvedata: "AAPL", polygon: "AAPL"}
+  - canonical: "MSFT"
+    providers: {yfinance: "MSFT", stooq: "MSFT.US", alphavantage: "MSFT", tiingo: "MSFT", twelvedata: "MSFT", polygon: "MSFT"}
+  - canonical: "NVDA"
+    providers: {yfinance: "NVDA", stooq: "NVDA.US", alphavantage: "NVDA", tiingo: "NVDA", twelvedata: "NVDA", polygon: "NVDA"}
+  - canonical: "AMZN"
+    providers: {yfinance: "AMZN", stooq: "AMZN.US", alphavantage: "AMZN", tiingo: "AMZN", twelvedata: "AMZN", polygon: "AMZN"}
+  - canonical: "GOOGL"
+    providers: {yfinance: "GOOGL", stooq: "GOOGL.US", alphavantage: "GOOGL", tiingo: "GOOGL", twelvedata: "GOOGL", polygon: "GOOGL"}
+  - canonical: "META"
+    providers: {yfinance: "META", stooq: "META.US", alphavantage: "META", tiingo: "META", twelvedata: "META", polygon: "META"}
+  - canonical: "TSLA"
+    providers: {yfinance: "TSLA", stooq: "TSLA.US", alphavantage: "TSLA", tiingo: "TSLA", twelvedata: "TSLA", polygon: "TSLA"}
+  - canonical: "JPM"
+    providers: {yfinance: "JPM", stooq: "JPM.US", alphavantage: "JPM", tiingo: "JPM", twelvedata: "JPM", polygon: "JPM"}
+  - canonical: "XOM"
+    providers: {yfinance: "XOM", stooq: "XOM.US", alphavantage: "XOM", tiingo: "XOM", twelvedata: "XOM", polygon: "XOM"}
+  - canonical: "JNJ"
+    providers: {yfinance: "JNJ", stooq: "JNJ.US", alphavantage: "JNJ", tiingo: "JNJ", twelvedata: "JNJ", polygon: "JNJ"}

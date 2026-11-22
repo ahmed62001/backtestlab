@@ -1,0 +1,14 @@
+# Crypto majors — symbols only, no data.
+symbols:
+  - canonical: "BTC-USD"
+    providers: {ccxt: "BTC/USDT", binance_public: "BTCUSDT", coingecko: "bitcoin", yfinance: "BTC-USD", twelvedata: "BTC/USD", polygon: "X:BTCUSD"}
+  - canonical: "ETH-USD"
+    providers: {ccxt: "ETH/USDT", binance_public: "ETHUSDT", coingecko: "ethereum", yfinance: "ETH-USD", twelvedata: "ETH/USD", polygon: "X:ETHUSD"}
+  - canonical: "SOL-USD"
+    providers: {ccxt: "SOL/USDT", binance_public: "SOLUSDT", coingecko: "solana", yfinance: "SOL-USD"}
+  - canonical: "XRP-USD"
+    providers: {ccxt: "XRP/USDT", binance_public: "XRPUSDT", coingecko: "ripple", yfinance: "XRP-USD"}
+  - canonical: "ADA-USD"
+    providers: {ccxt: "ADA/USDT", binance_public: "ADAUSDT", coingecko: "cardano", yfinance: "ADA-USD"}
+  - canonical: "DOGE-USD"
+    providers: {ccxt: "DOGE/USDT", binance_public: "DOGEUSDT", coingecko: "dogecoin", yfinance: "DOGE-USD"}

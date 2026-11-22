@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: sqlite:///./backtestlab.db
+      LOCAL_JWT_SECRET: ${LOCAL_JWT_SECRET:-change-me-32-chars-minimum-please}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    volumes: ["bldata:/srv"]
+volumes:
+  bldata:

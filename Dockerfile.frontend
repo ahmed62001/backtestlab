@@ -1,0 +1,57 @@
+# Multi-stage production Dockerfile for the BacktestLab frontend.
+# Stage 1: node:20-alpine build (npm ci && npm run build).
+# Stage 2: nginx:alpine serving dist/ with SPA fallback, gzip, security headers,
+# and /api reverse-proxied to the backend service.
+# Non-root nginx worker; HEALTHCHECK on /nginx-health.
+
+# ---- Build stage ----
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+# Install deps first (layer cache).
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+# Copy source + config.
+COPY . .
+
+# Build for production (Vite inlines VITE_* from .env at build time).
+# Empty = same-origin, so the SPA talks to nginx (/api -> backend). Never bake
+# a localhost URL into a production image.
+ARG VITE_USE_MOCK=false
+ARG VITE_API_BASE=
+ARG VITE_APP_NAME=BacktestLab
+ENV VITE_USE_MOCK=${VITE_USE_MOCK}
+ENV VITE_API_BASE=${VITE_API_BASE}
+ENV VITE_APP_NAME=${VITE_APP_NAME}
+
+RUN npm run build
+
+# ---- Runtime stage ----
+FROM nginx:alpine AS runtime
+
+# Install curl for HEALTHCHECK.
+RUN apk add --no-cache curl
+
+# Create nginx directories and set permissions for non-root user.
+RUN mkdir -p /var/cache/nginx /var/log/nginx /run /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /run /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+
+# Copy built assets.
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx config (production, with /api proxy + security headers).
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-security-headers.conf /etc/nginx/security-headers.conf
+
+# Switch to nginx user.
+USER nginx
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=5 \
+    CMD curl -fsS http://localhost:80/nginx-health || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

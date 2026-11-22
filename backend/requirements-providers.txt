@@ -1,0 +1,15 @@
+# Optional provider extras — install only if you use these providers.
+#
+# The app boots and the catalog works without this file: each provider is
+# imported lazily and reports available=false with the missing package name.
+#
+# cffi conflict resolution (Phase 12):
+#   ccxt 4.5.x pins cffi==2.0.0 exactly.
+#   yfinance 1.8+ pulls curl-cffi>=0.17, which requires cffi>=2.1.1.
+#   We pin yfinance 1.7.0 + curl-cffi 0.16.3, which require cffi>=2.0.0 and
+#   work with ccxt's exact pin. Verified with `pip check` (no broken
+#   requirements) and by importing yfinance/ccxt/cffi in a clean venv.
+yfinance==1.7.0
+ccxt==4.5.91
+curl-cffi==0.16.3
+cffi==2.0.0

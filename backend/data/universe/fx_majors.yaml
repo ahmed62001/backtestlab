@@ -1,0 +1,14 @@
+# FX majors — symbols only, no data.
+symbols:
+  - canonical: "EURUSD"
+    providers: {yfinance: "EURUSD=X", frankfurter: "EUR", twelvedata: "EUR/USD", polygon: "C:EURUSD"}
+  - canonical: "GBPUSD"
+    providers: {yfinance: "GBPUSD=X", frankfurter: "GBP", twelvedata: "GBP/USD", polygon: "C:GBPUSD"}
+  - canonical: "USDJPY"
+    providers: {yfinance: "USDJPY=X", frankfurter: "JPY", twelvedata: "USD/JPY", polygon: "C:USDJPY"}
+  - canonical: "USDCHF"
+    providers: {yfinance: "USDCHF=X", frankfurter: "CHF", twelvedata: "USD/CHF", polygon: "C:USDCHF"}
+  - canonical: "AUDUSD"
+    providers: {yfinance: "AUDUSD=X", frankfurter: "AUD", twelvedata: "AUD/USD", polygon: "C:AUDUSD"}
+  - canonical: "USDCAD"
+    providers: {yfinance: "USDCAD=X", frankfurter: "CAD", twelvedata: "USD/CAD", polygon: "C:USDCAD"}

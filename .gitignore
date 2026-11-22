@@ -1,0 +1,37 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+# Local provider credential file — must never be committed.
+market apis
+logs/
+*.log
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite*
+.venv/
+backend/.venv/
+backend/backtestlab.db
+backend/*.db
+.DS_Store
+*.pyc
+htmlcov/
+coverage/
+.vscode/
+playwright-report/
+blob-report/
+test-results/
+final-test/
+final-release-evidence/
+final-test.md
+final-release.md
+final report.txt
+last.md

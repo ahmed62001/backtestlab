@@ -1,0 +1,25 @@
+# Backend .dockerignore — excludes caches, venvs, secrets, and local data.
+.git
+.gitignore
+.github
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.sqlite3
+.venv/
+.env
+.env.*
+*.log
+*.bak
+*.new
+.coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+node_modules/
+dist/
+README.md

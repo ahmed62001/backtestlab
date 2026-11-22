@@ -1,0 +1,163 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      # Fail fast instead of silently deploying the well-known default password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set to a strong value}
+      POSTGRES_USER: ${POSTGRES_USER:-backtestlab}
+      POSTGRES_DB: ${POSTGRES_DB:-backtestlab}
+    ports:
+      # Database is internal-only; bind to loopback for operator tooling.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-backtestlab} -d ${POSTGRES_DB:-backtestlab}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://${POSTGRES_USER:-backtestlab}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-backtestlab}}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      # The API must not be reachable directly from outside; nginx fronts it.
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://${POSTGRES_USER:-backtestlab}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-backtestlab}}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      # No fallback: production refuses to boot without a real signing key.
+      LOCAL_JWT_SECRET: ${LOCAL_JWT_SECRET:?LOCAL_JWT_SECRET must be set to a random 32+ char value}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      ENV: ${ENV:-production}
+      COOKIE_SECURE: ${COOKIE_SECURE:-0}
+      ENGINE_MODE: ${ENGINE_MODE:-vendor}
+      AUTH_PROVIDER: ${AUTH_PROVIDER:-local}
+      AUTH_RESET_TOKEN_LOG: ${AUTH_RESET_TOKEN_LOG:-0}
+      QUEUE_INPROCESS_WORKER: ${QUEUE_INPROCESS_WORKER:-0}
+      ASYNC_BACKTESTS_DEFAULT: ${ASYNC_BACKTESTS_DEFAULT:-1}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-none}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:5173}
+      BILLING_ENABLED: ${BILLING_ENABLED:-false}
+      DATA_PROVIDER_DEFAULT: ${DATA_PROVIDER_DEFAULT:-yfinance}
+      MAX_BARS: ${MAX_BARS:-5000}
+      JOB_TIMEOUT_SECONDS: ${JOB_TIMEOUT_SECONDS:-120}
+      DATA_CACHE_DIR: /tmp/btlab_cache
+      DATA_UPLOAD_DIR: /tmp/btlab_uploads
+      # Shared Redis + PostgreSQL state allows UVICORN_WORKERS > 1 when needed.
+      UVICORN_WORKERS: ${UVICORN_WORKERS:-1}
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-1}
+      LOG_FORMAT: ${LOG_FORMAT:-json}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # Optional provider API keys (not required for normal operation).
+      # Missing keys simply mark the corresponding provider as unavailable.
+      ALPHAVANTAGE_API_KEY: ${ALPHAVANTAGE_API_KEY:-}
+      FRED_API_KEY: ${FRED_API_KEY:-}
+      TIINGO_API_KEY: ${TIINGO_API_KEY:-}
+      TWELVEDATA_API_KEY: ${TWELVEDATA_API_KEY:-}
+      MASSIVE_API_KEY: ${MASSIVE_API_KEY:-}
+      POLYGON_API_KEY: ${POLYGON_API_KEY:-}
+    volumes:
+      - uploads:/tmp/btlab_uploads
+      - cache:/tmp/btlab_cache
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["python", "-m", "app.worker"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://${POSTGRES_USER:-backtestlab}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-backtestlab}}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      LOCAL_JWT_SECRET: ${LOCAL_JWT_SECRET:?LOCAL_JWT_SECRET must be set to a random 32+ char value}
+      ENV: ${ENV:-production}
+      ENGINE_MODE: ${ENGINE_MODE:-vendor}
+      AUTH_PROVIDER: ${AUTH_PROVIDER:-local}
+      DATA_PROVIDER_DEFAULT: ${DATA_PROVIDER_DEFAULT:-yfinance}
+      MAX_BARS: ${MAX_BARS:-5000}
+      JOB_TIMEOUT_SECONDS: ${JOB_TIMEOUT_SECONDS:-120}
+      DATA_CACHE_DIR: /tmp/btlab_cache
+      DATA_UPLOAD_DIR: /tmp/btlab_uploads
+      LOG_FORMAT: ${LOG_FORMAT:-json}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # Optional provider API keys (not required for normal operation).
+      # Missing keys simply mark the corresponding provider as unavailable.
+      ALPHAVANTAGE_API_KEY: ${ALPHAVANTAGE_API_KEY:-}
+      FRED_API_KEY: ${FRED_API_KEY:-}
+      TIINGO_API_KEY: ${TIINGO_API_KEY:-}
+      TWELVEDATA_API_KEY: ${TWELVEDATA_API_KEY:-}
+      MASSIVE_API_KEY: ${MASSIVE_API_KEY:-}
+      POLYGON_API_KEY: ${POLYGON_API_KEY:-}
+    volumes:
+      # Same volumes as the backend so async csv_upload jobs can read files.
+      - uploads:/tmp/btlab_uploads
+      - cache:/tmp/btlab_cache
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c '[ $(($(date +%s) - $(stat -c %Y /tmp/worker.alive 2>/dev/null || echo 0))) -lt 30 ]'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        # Always build the production bundle: mocks off, same-origin API. Do not
+        # interpolate these from .env — a developer .env must never leak into a
+        # release image. Use an override file for a split-origin deployment.
+        VITE_USE_MOCK: "false"
+        VITE_API_BASE: ""
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  bldata:
+  uploads:
+  cache:

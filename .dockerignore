@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.git/
+.venv/
+backend/.venv/
+*.db
+*.log
+.env
+.env.*
+coverage/
+htmlcov/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

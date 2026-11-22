@@ -1,0 +1,14 @@
+# Macro series — symbols only, no data. Requires FRED_API_KEY to ingest.
+symbols:
+  - canonical: "DGS10"
+    providers: {fred: "DGS10"}
+  - canonical: "DGS2"
+    providers: {fred: "DGS2"}
+  - canonical: "CPIAUCSL"
+    providers: {fred: "CPIAUCSL"}
+  - canonical: "UNRATE"
+    providers: {fred: "UNRATE"}
+  - canonical: "GDP"
+    providers: {fred: "GDP"}
+  - canonical: "VIXCLS"
+    providers: {fred: "VIXCLS"}

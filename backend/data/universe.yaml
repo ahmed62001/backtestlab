@@ -1,0 +1,132 @@
+# Universe YAML — canonical symbol list with per-provider mappings
+# Phase 4: Symbol universe definition for backtest data management.
+# Each symbol lists providers that support it and their symbol formats.
+
+symbols:
+  # Crypto
+  - canonical: "BTC-USD"
+    providers:
+      ccxt: "BTC/USDT"
+      binance_public: "BTCUSDT"
+      coingecko: "bitcoin"
+      yfinance: "BTC-USD"
+      twelvedata: "BTC/USD"
+      polygon: "X:BTCUSD"
+  - canonical: "ETH-USD"
+    providers:
+      ccxt: "ETH/USDT"
+      binance_public: "ETHUSDT"
+      coingecko: "ethereum"
+      yfinance: "ETH-USD"
+      twelvedata: "ETH/USD"
+      polygon: "X:ETHUSD"
+  - canonical: "SOL-USD"
+    providers:
+      ccxt: "SOL/USDT"
+      binance_public: "SOLUSDT"
+      coingecko: "solana"
+      yfinance: "SOL-USD"
+      twelvedata: "SOL/USD"
+
+  # US Equities
+  - canonical: "AAPL"
+    providers:
+      yfinance: "AAPL"
+      stooq: "AAPL.US"
+      tiingo: "AAPL"
+      twelvedata: "AAPL"
+      polygon: "AAPL"
+  - canonical: "MSFT"
+    providers:
+      yfinance: "MSFT"
+      stooq: "MSFT.US"
+      tiingo: "MSFT"
+      twelvedata: "MSFT"
+      polygon: "MSFT"
+  - canonical: "GOOGL"
+    providers:
+      yfinance: "GOOGL"
+      stooq: "GOOGL.US"
+      tiingo: "GOOGL"
+      twelvedata: "GOOGL"
+      polygon: "GOOGL"
+  - canonical: "TSLA"
+    providers:
+      yfinance: "TSLA"
+      stooq: "TSLA.US"
+      tiingo: "TSLA"
+      twelvedata: "TSLA"
+      polygon: "TSLA"
+  - canonical: "AMZN"
+    providers:
+      yfinance: "AMZN"
+      stooq: "AMZN.US"
+      tiingo: "AMZN"
+      twelvedata: "AMZN"
+      polygon: "AMZN"
+  - canonical: "NVDA"
+    providers:
+      yfinance: "NVDA"
+      stooq: "NVDA.US"
+      tiingo: "NVDA"
+      twelvedata: "NVDA"
+      polygon: "NVDA"
+  - canonical: "META"
+    providers:
+      yfinance: "META"
+      tiingo: "META"
+      twelvedata: "META"
+      polygon: "META"
+  - canonical: "IBM"
+    providers:
+      yfinance: "IBM"
+      tiingo: "IBM"
+      twelvedata: "IBM"
+      polygon: "IBM"
+      alphavantage: "IBM"
+
+  # FX
+  - canonical: "EURUSD"
+    providers:
+      yfinance: "EURUSD=X"
+      frankfurter: "EUR"
+      twelvedata: "EUR/USD"
+      polygon: "C:EURUSD"
+  - canonical: "GBPUSD"
+    providers:
+      yfinance: "GBPUSD=X"
+      frankfurter: "GBP"
+      twelvedata: "GBP/USD"
+      polygon: "C:GBPUSD"
+  - canonical: "USDJPY"
+    providers:
+      yfinance: "USDJPY=X"
+      frankfurter: "USDJPY"
+      twelvedata: "USD/JPY"
+      polygon: "C:USDJPY"
+
+  # Macro (FRED series)
+  - canonical: "GDP"
+    providers:
+      fred: "GDP"
+  - canonical: "CPI"
+    providers:
+      fred: "CPIAUCSL"
+  - canonical: "UNRATE"
+    providers:
+      fred: "UNRATE"
+  - canonical: "FEDFUNDS"
+    providers:
+      fred: "FEDFUNDS"
+  - canonical: "DGS10"
+    providers:
+      fred: "DGS10"
+  - canonical: "VIX"
+    providers:
+      fred: "VIXCLS"
+
+categories:
+  equities: ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN", "NVDA", "META", "IBM"]
+  crypto: ["BTC-USD", "ETH-USD", "SOL-USD"]
+  fx: ["EURUSD", "GBPUSD", "USDJPY"]
+  macro: ["GDP", "CPI", "UNRATE", "FEDFUNDS", "DGS10", "VIX"]

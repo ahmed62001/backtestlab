@@ -1,0 +1,35 @@
+# Reproducible constraints for the supported CPython 3.13 runtime.
+#
+#   pip install -c backend/constraints-py313.txt -r backend/requirements-dev.txt
+#
+# The Docker image, CI and the README all target Python 3.13. This file does
+# not replace the requirements files; it pins the transitive resolution that
+# was verified on 3.13 so a developer on a newer interpreter cannot silently
+# pull wheels that are unavailable in production.
+fastapi==0.162.0
+uvicorn==0.38.0
+SQLAlchemy==2.1.6
+pydantic==2.14.2
+pydantic-settings==2.14.2
+PyJWT==2.15.1
+httpx==0.28.1
+requests==2.33.0
+argon2-cffi==25.1.0
+cryptography==50.0.2
+pandas==3.1.0
+numpy==2.5.4
+alembic==1.20.1
+psycopg[binary]==3.3.6
+PyYAML==6.0.3
+defusedxml==0.7.1
+yfinance==1.7.0
+ccxt==4.5.91
+curl-cffi==0.16.3
+cffi==2.0.0
+pytest==9.0.3
+pytest-cov==7.0.0
+respx==0.22.0
+ruff==0.16.4
+mypy==1.19.1
+types-PyYAML==6.0.12.20261103
+pip-audit==2.10.0

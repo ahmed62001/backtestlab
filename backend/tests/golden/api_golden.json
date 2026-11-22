@@ -1,0 +1,36 @@
+{
+  "generated_by": "regen after Phase 2 SpotBacktestEngine cost-model fix (commissionPct+slippagePct both charged); see docs/ENGINE_VERIFICATION.md",
+  "config": {
+    "templateId": "ma-crossover",
+    "asset": "AAPL",
+    "from": "2022-01-01",
+    "to": "2022-12-31",
+    "initialCapital": 10000,
+    "feePct": 0.1,
+    "params": {
+      "fastPeriod": 10,
+      "slowPeriod": 30
+    },
+    "dataProvider": "local"
+  },
+  "tolerance": 0.011,
+  "vendor_direct": {
+    "totalReturnPct": -0.74,
+    "maxDrawdownPct": -4.97,
+    "trades": 2,
+    "sharpe": -0.07,
+    "finalValue": 9926.387114267714
+  },
+  "api": {
+    "totalReturnPct": -0.74,
+    "maxDrawdownPct": -4.97,
+    "trades": 2,
+    "sharpe": -0.07
+  },
+  "engine": {
+    "mode": "vendor",
+    "engineName": "vibe-trading:GlobalEquityEngine",
+    "vendorCommit": "c546e877274e7d36056c042808e1a875d9081eb9",
+    "vendorVersionOrRef": "c546e877274e7d36056c042808e1a875d9081eb9"
+  }
+}

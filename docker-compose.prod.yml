@@ -1,0 +1,31 @@
+# Production TLS overlay:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Requires DOMAIN, POSTGRES_PASSWORD, LOCAL_JWT_SECRET, and COOKIE_SECURE=1.
+
+services:
+  backend:
+    environment:
+      COOKIE_SECURE: ${COOKIE_SECURE:-1}
+      UVICORN_WORKERS: ${UVICORN_WORKERS:-2}
+
+  frontend:
+    ports: []
+
+  caddy:
+    image: caddy:2.8-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN must be set for TLS certificate provisioning}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

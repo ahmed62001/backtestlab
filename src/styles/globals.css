@@ -1,0 +1,351 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Visual identity: Noir Amethyst & Molten Gold (Dark) / Ivory Silk & Royal Violet (Light).
+ * CSS vars below mirror src/lib/tokens.ts exactly (check-colors allowlist). */
+
+:root {
+  --bg: #f8f6f1;
+  --bg-rgb: 248 246 241;
+  --card: #ffffff;
+  --card-rgb: 255 255 255;
+  --surface: #efece4;
+  --surface-rgb: 239 236 228;
+  --card-glass: rgba(255, 255, 255, 0.84);
+  --header-glass: rgba(248, 246, 241, 0.85);
+  --text: #14111f;
+  --text-rgb: 20 17 31;
+  --muted-text: #5e5a72;
+  --muted-text-rgb: 94 90 114;
+  --primary: #6d28d9;
+  --primary-rgb: 109 40 217;
+  --primary-hover: #5b21b6;
+  --primary-hover-rgb: 91 33 182;
+  --ring: #7c3aed;
+  --ring-rgb: 124 58 237;
+  --border: #e4dfd3;
+  --border-rgb: 228 223 211;
+  --input: #cbc4b6;
+  --gain: #059669;
+  --gain-rgb: 5 150 105;
+  --gain-bg: #ecfdf5;
+  --gain-bg-rgb: 236 253 245;
+  --loss: #e11d48;
+  --loss-rgb: 225 29 72;
+  --loss-bg: #fff1f2;
+  --loss-bg-rgb: 255 241 242;
+  --warn: #b45309;
+  --warn-rgb: 180 83 9;
+  --warn-bg: #fffbeb;
+  --warn-bg-rgb: 255 251 235;
+  --gold: #d97706;
+  --gold-rgb: 217 119 6;
+  --gold-bg: #fef3c7;
+  --gold-bg-rgb: 254 243 199;
+  --glow-brand: rgba(109, 40, 217, 0.24);
+  --glow-gold: rgba(217, 119, 6, 0.24);
+  --shadow-bento: 0 1px 2px rgba(20, 17, 31, 0.04), 0 10px 28px -14px rgba(20, 17, 31, 0.1);
+  --shadow-bento-hover: 0 4px 12px rgba(20, 17, 31, 0.06), 0 22px 42px -14px rgba(109, 40, 217, 0.22);
+  --mesh-top: radial-gradient(ellipse 80% 50% at 50% -12%, rgba(109, 40, 217, 0.11), transparent 72%);
+  --mesh-accent: radial-gradient(ellipse 50% 40% at 90% 10%, rgba(217, 119, 6, 0.09), transparent 68%);
+  --dot-grid: radial-gradient(rgba(20, 17, 31, 0.055) 1px, transparent 1px);
+  --card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0b0a10;
+  --bg-rgb: 11 10 16;
+  --card: #14121d;
+  --card-rgb: 20 18 29;
+  --surface: #1d1a2b;
+  --surface-rgb: 29 26 43;
+  --card-glass: rgba(20, 18, 29, 0.78);
+  --header-glass: rgba(11, 10, 16, 0.82);
+  --text: #f5f3fa;
+  --text-rgb: 245 243 250;
+  --muted-text: #9b95b0;
+  --muted-text-rgb: 155 149 176;
+  --primary: #7c3aed;
+  --primary-rgb: 124 58 237;
+  --primary-hover: #8b5cf6;
+  --primary-hover-rgb: 139 92 246;
+  --ring: #a78bfa;
+  --ring-rgb: 167 139 250;
+  --border: #29253b;
+  --border-rgb: 41 37 59;
+  --input: #3b3554;
+  --gain: #34d399;
+  --gain-rgb: 52 211 153;
+  --gain-bg: #063b2c;
+  --gain-bg-rgb: 6 59 44;
+  --loss: #fb7185;
+  --loss-rgb: 251 113 133;
+  --loss-bg: #440f1d;
+  --loss-bg-rgb: 68 15 29;
+  --warn: #fbbf24;
+  --warn-rgb: 251 191 36;
+  --warn-bg: #3e2a06;
+  --warn-bg-rgb: 62 42 6;
+  --gold: #f59e0b;
+  --gold-rgb: 245 158 11;
+  --gold-bg: #3e2a06;
+  --gold-bg-rgb: 62 42 6;
+  --glow-brand: rgba(139, 92, 246, 0.36);
+  --glow-gold: rgba(245, 158, 11, 0.28);
+  --shadow-bento: 0 2px 4px rgba(0, 0, 0, 0.45), 0 14px 36px -12px rgba(0, 0, 0, 0.72);
+  --shadow-bento-hover: 0 4px 12px rgba(0, 0, 0, 0.55), 0 26px 48px -12px rgba(124, 58, 237, 0.28);
+  --mesh-top: radial-gradient(ellipse 80% 50% at 50% -14%, rgba(124, 58, 237, 0.22), transparent 72%);
+  --mesh-accent: radial-gradient(ellipse 50% 40% at 88% 8%, rgba(245, 158, 11, 0.12), transparent 65%);
+  --dot-grid: radial-gradient(rgba(245, 243, 250, 0.055) 1px, transparent 1px);
+  --card-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.065);
+  color-scheme: dark;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+body {
+  background-color: var(--bg);
+  background-image: var(--mesh-top), var(--mesh-accent), var(--dot-grid);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: Inter, 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html[lang='ar'] body {
+  font-family: 'IBM Plex Sans Arabic', Inter, system-ui, sans-serif;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.tnum {
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+}
+.ltr-isolate {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Prices and financial figures: tabular mono stack, always LTR-isolated. */
+.fin {
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: -4rem;
+  z-index: 100;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  transition: top 200ms ease;
+}
+.skip-link:focus {
+  top: 0.5rem;
+  color: #fff;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 14px;
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Ticker tape: horizontal scroll, RTL-aware (scrolls from inline start). */
+.tape-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tape-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Glassmorphism 3.0 surface treatments */
+.glass-header {
+  background: var(--header-glass);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+.glass-card {
+  background: var(--card-glass);
+  backdrop-filter: blur(20px) saturate(165%);
+  -webkit-backdrop-filter: blur(20px) saturate(165%);
+  box-shadow: var(--card-bevel), var(--shadow-bento);
+}
+
+/* Bento card surface with subtle top bevel + depth */
+.bento-card {
+  background: var(--card);
+  box-shadow: var(--card-bevel), var(--shadow-bento);
+}
+.bento-card-interactive:hover {
+  box-shadow: var(--card-bevel), var(--shadow-bento-hover);
+}
+
+/* Brand gradient emblem, headline accent & CTA surface */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 55%, var(--gold) 140%);
+}
+.gold-gradient {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--warn) 100%);
+}
+.text-gradient-brand {
+  background: linear-gradient(135deg, var(--text) 15%, var(--primary) 65%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-mesh-card {
+  background:
+    radial-gradient(circle at 12% 14%, var(--glow-brand), transparent 52%),
+    radial-gradient(circle at 88% 86%, var(--glow-gold), transparent 48%),
+    var(--card);
+  box-shadow: var(--card-bevel), var(--shadow-bento);
+}
+
+/* Accent top stripe for highlighted sections */
+.accent-top-line {
+  position: relative;
+}
+.accent-top-line::before {
+  content: '';
+  position: absolute;
+  inset-inline: 1.5rem;
+  top: 0;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, var(--primary), var(--gold), transparent);
+  opacity: 0.75;
+}
+
+/* Subtle glow effects for cards & buttons */
+.glow-brand-subtle {
+  box-shadow: var(--card-bevel), 0 0 36px -6px var(--glow-brand);
+}
+
+.glow-gold-subtle {
+  box-shadow: var(--card-bevel), 0 0 36px -6px var(--glow-gold);
+}
+
+/* Crisp data table polish */
+table tbody tr {
+  transition: background-color 160ms ease;
+}
+table tbody tr:hover {
+  background-color: var(--surface);
+}
+
+/* Scroll progress indicator (top of window) */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--gold));
+  z-index: 60;
+  transition: width 100ms ease-out;
+  pointer-events: none;
+}
+
+/* Back to Top floating button */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  inset-inline-end: 1.5rem;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: var(--card-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--card-bevel), var(--shadow-bento);
+  transition: all 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.92);
+}
+
+.back-to-top-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.back-to-top-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: var(--card-bevel), 0 12px 28px -8px var(--glow-brand);
+}
+
+.back-to-top-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Tactile micro-interactions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .skeleton {
+    animation: none;
+  }
+  .animate-fade-in-up {
+    animation: none;
+  }
+}

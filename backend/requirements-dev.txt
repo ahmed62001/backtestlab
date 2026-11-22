@@ -1,0 +1,16 @@
+# Development/test tooling. Installs the full runtime + provider set so a
+# single command reproduces CI locally:
+#
+#   pip install -r backend/requirements-dev.txt
+#
+# Tool versions are pinned so lint/format/type results are reproducible.
+-r requirements.txt
+-r requirements-providers.txt
+
+pytest==9.0.3
+pytest-cov==7.0.0
+respx==0.22.0
+ruff==0.16.4
+mypy==1.19.1
+types-PyYAML==6.0.12.20261103
+pip-audit==2.10.0

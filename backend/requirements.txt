@@ -1,0 +1,22 @@
+# Core runtime requirements — always needed (auth, API, data layer, CLI).
+#
+# pandas/numpy are core because the provider base class and the vendor engine
+# operate on DataFrames; the app cannot import its provider registry without
+# them. Optional network providers live in requirements-providers.txt.
+fastapi==0.162.0
+uvicorn==0.38.0
+SQLAlchemy==2.1.6
+pydantic==2.14.2
+pydantic-settings==2.14.2
+PyJWT==2.15.1
+httpx==0.28.1
+requests==2.33.0
+argon2-cffi==25.1.0
+cryptography==50.0.2
+pandas==3.1.0
+numpy==2.5.4
+alembic==1.20.1
+psycopg[binary]==3.3.6
+PyYAML==6.0.3
+defusedxml==0.7.1
+redis==5.3.1

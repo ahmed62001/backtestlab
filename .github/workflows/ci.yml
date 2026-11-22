@@ -1,0 +1,158 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ---- Frontend ----
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20, cache: 'npm'}
+      - run: npm ci
+      - run: npm run verify
+
+  # ---- Backend lint + format + types ----
+  lint-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+        cache: 'pip'
+      - run: pip install -r backend/requirements-dev.txt
+      - run: cd backend && ruff check .
+      - run: cd backend && ruff format --check .
+      - run: cd backend && mypy
+      # Optional provider packages must import cleanly on the supported
+      # interpreter even though the core app never requires them at runtime.
+      - run: cd backend && python -c "import yfinance, ccxt, cffi, curl_cffi; print('optional providers import OK')"
+      - run: cd backend && python scripts/verify_vendor.py
+
+  # ---- Backend on SQLite ----
+  backend-sqlite:
+    runs-on: ubuntu-latest
+    needs: [lint-backend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+        cache: 'pip'
+      - run: pip install -r backend/requirements-dev.txt
+      - run: cd backend && DATABASE_URL=sqlite:////tmp/ci_sqlite.db python -m alembic upgrade head
+      - run: cd backend && rm -f /tmp/bt_test.db && python -m pytest tests/ -q --cov=app --cov-fail-under=70 -p no:cacheprovider
+      - run: python backend/scripts/update_openapi_snapshot.py --check
+
+  # ---- Backend on PostgreSQL 16 ----
+  backend-postgres:
+    runs-on: ubuntu-latest
+    needs: [lint-backend]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_USER: btlab
+          POSTGRES_DB: btlab
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+        cache: 'pip'
+      - run: pip install -r backend/requirements-dev.txt
+      - run: cd backend && DATABASE_URL=postgresql+psycopg://btlab:ci-only-password@localhost:5432/btlab python -m alembic upgrade head
+      - run: cd backend && DATABASE_URL=postgresql+psycopg://btlab:ci-only-password@localhost:5432/btlab python -m alembic downgrade 5d8a7492f5a8
+      - run: cd backend && DATABASE_URL=postgresql+psycopg://btlab:ci-only-password@localhost:5432/btlab python -m alembic upgrade head
+      - run: cd backend && DATABASE_URL=postgresql+psycopg://btlab:ci-only-password@localhost:5432/btlab python -m alembic check
+      - run: cd backend && DATABASE_URL=postgresql+psycopg://btlab:ci-only-password@localhost:5432/btlab python -m pytest tests/ -q --cov=app --cov-fail-under=70 -p no:cacheprovider
+      - run: python backend/scripts/update_openapi_snapshot.py --check
+
+  # ---- Security audits ----
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+        cache: 'pip'
+      - run: pip install -r backend/requirements-dev.txt
+      - run: pip check
+      - run: pip-audit -r backend/requirements.txt -r backend/requirements-providers.txt -r backend/requirements-dev.txt
+      - run: "! grep -rniE 'agpl|affero' backend/requirements.txt backend/requirements-providers.txt backend/requirements-dev.txt"
+      - uses: actions/setup-node@v4
+        with: {node-version: 20, cache: 'npm'}
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+
+  # ---- Build Docker images + validate compose ----
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t backtestlab/backend ./backend
+      - run: docker build -t backtestlab/frontend -f Dockerfile.frontend .
+      - run: docker compose config
+
+  # ---- Playwright E2E (Phase 11) ----
+  # Real browser test against the real backend + seeded synthetic data:
+  # e2e/start-backend.sh boots a throwaway SQLite DB with local_store data and
+  # playwright.config.ts starts Vite with VITE_USE_MOCK=false.
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [frontend, backend-sqlite]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20, cache: 'npm'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+        cache: 'pip'
+      - run: npm ci
+      - run: pip install -r backend/requirements-dev.txt
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  # ---- Live provider smoke (non-blocking; secrets only) ----
+  live-provider-smoke:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - run: pip install -r backend/requirements-dev.txt
+      - run: cd backend && python scripts/smoke_providers.py
+        env:
+          STOOQ_API_KEY: ${{ secrets.STOOOQ_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}

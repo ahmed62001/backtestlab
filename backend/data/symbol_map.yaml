@@ -1,0 +1,69 @@
+# Canonical symbol <-> provider-specific symbol mapping
+# Each canonical symbol maps to provider-specific symbol formats.
+BTC-USD:
+  ccxt: "BTC/USDT"
+  binance: "BTCUSDT"
+  binance_public: "BTCUSDT"
+  coingecko: "bitcoin"
+  yfinance: "BTC-USD"
+  twelvedata: "BTC/USD"
+  polygon: "X:BTCUSD"
+ETH-USD:
+  ccxt: "ETH/USDT"
+  binance: "ETHUSDT"
+  binance_public: "ETHUSDT"
+  coingecko: "ethereum"
+  yfinance: "ETH-USD"
+  twelvedata: "ETH/USD"
+  polygon: "X:ETHUSD"
+AAPL:
+  yfinance: "AAPL"
+  stooq: "AAPL.US"
+  tiingo: "AAPL"
+  twelvedata: "AAPL"
+  polygon: "AAPL"
+MSFT:
+  yfinance: "MSFT"
+  stooq: "MSFT.US"
+  tiingo: "MSFT"
+  twelvedata: "MSFT"
+  polygon: "MSFT"
+GOOGL:
+  yfinance: "GOOGL"
+  stooq: "GOOGL.US"
+  tiingo: "GOOGL"
+  twelvedata: "GOOGL"
+  polygon: "GOOGL"
+TSLA:
+  yfinance: "TSLA"
+  stooq: "TSLA.US"
+  tiingo: "TSLA"
+  twelvedata: "TSLA"
+  polygon: "TSLA"
+EURUSD:
+  yfinance: "EURUSD=X"
+  frankfurter: "EUR"
+  twelvedata: "EUR/USD"
+  polygon: "C:EURUSD"
+GBPUSD:
+  yfinance: "GBPUSD=X"
+  frankfurter: "GBP"
+  twelvedata: "GBP/USD"
+  polygon: "C:GBPUSD"
+USDJPY:
+  yfinance: "USDJPY=X"
+  frankfurter: "USDJPY"
+  twelvedata: "USD/JPY"
+  polygon: "C:USDJPY"
+GDP:
+  fred: "GDP"
+CPI:
+  fred: "CPIAUCSL"
+UNEMPLOYMENT:
+  fred: "UNRATE"
+FEDFUNDS:
+  fred: "FEDFUNDS"
+TREASURY_10Y:
+  fred: "DGS10"
+VIX:
+  fred: "VIXCLS"

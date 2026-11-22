@@ -1,0 +1,17 @@
+import { chromium } from '@playwright/test';
+import fs from 'node:fs';
+const BASE='http://localhost:5173';
+const token=fs.readFileSync('/tmp/opencode/token.txt','utf8').trim();
+const email=fs.readFileSync('/tmp/opencode/email.txt','utf8').trim();
+const browser=await chromium.launch();
+const ctx=await browser.newContext({viewport:{width:1440,height:900},locale:'en-US'});
+await ctx.addInitScript(([t,e])=>{localStorage.setItem('bl_session',JSON.stringify({token:t,refreshToken:'',user:{id:'u-5770e7ca',name:'Release QA',email:e,plan:'free',language:'en'}}));localStorage.setItem('bl_lang','en');localStorage.setItem('bl_theme','light');},[token,email]);
+const page=await ctx.newPage();
+await page.goto(BASE+'/app/new',{waitUntil:'domcontentloaded'});
+await page.waitForTimeout(3000);
+console.log('url',page.url());
+console.log('h1',await page.locator('h1').first().innerText().catch(()=>'-'));
+console.log('radios',await page.locator('[role="radio"]').count());
+console.log('body',(await page.locator('body').innerText()).slice(0,300).replace(/\n/g,' | '));
+await page.screenshot({path:'/tmp/opencode/newpage.png'});
+await browser.close();

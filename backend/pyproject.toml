@@ -1,0 +1,60 @@
+# Backend tooling configuration (ruff lint/format + mypy).
+#
+# Scope: `app`, `tests`, `scripts`. The vendored Vibe-Trading tree is excluded:
+# it is third-party code we do not reformat, and it ships its own tooling.
+#
+# ruff:
+#   ruff check .
+#   ruff format --check .
+# mypy:
+#   mypy app
+#
+# CI pins the exact tool versions in requirements-dev.txt.
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["app", "tests", "scripts"]
+extend-exclude = [
+    "vendor",
+    "migrations/versions",
+    ".venv",
+]
+
+[tool.ruff.lint]
+# Pragmatic rule set: correctness (E/F), import hygiene (I), likely bugs (B),
+# modernisation (UP) and simplification (SIM). E501 is intentionally not
+# enabled: the formatter owns code width, and long URLs/strings are legitimate.
+select = ["E4", "E7", "E9", "F", "I", "B", "UP", "C4", "SIM"]
+ignore = [
+    # FastAPI uses function calls (Depends/Query/Body) in argument defaults.
+    "B008",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests/scripts bootstrap env vars and sys.path before importing the app.
+"tests/*" = ["E402"]
+"scripts/*" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.13"
+mypy_path = "."
+files = ["app/data_providers", "app/data_store"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+show_error_codes = true
+exclude = ["vendor/"]
+
+# Strict typing for the data layer (the code most likely to hide bugs).
+[[tool.mypy.overrides]]
+module = ["app.data_providers.*", "app.data_store.*"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_return_any = true
+no_implicit_optional = true

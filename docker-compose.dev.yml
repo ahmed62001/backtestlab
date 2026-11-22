@@ -1,0 +1,76 @@
+# Dev override: hot-reload frontend dev server + backend --reload, SQLite by default.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+services:
+  # SQLite by default in dev — no postgres needed. 
+  # For PG in dev: docker compose --profile pg up
+  migrate:
+    profiles: ["pg"]
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+
+  backend:
+    depends_on: !reset []
+    command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--no-access-log"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/backtestlab.db}
+      ENV: dev
+      UVICORN_WORKERS: "1"
+      LOG_FORMAT: text
+      LOG_LEVEL: INFO
+    volumes:
+      - ./backend/app:/srv/app
+      - ./backend/migrations:/srv/migrations
+      - ./backend/data:/srv/data
+      - ./backend/alembic.ini:/srv/alembic.ini
+      - bldata:/data
+
+  worker:
+    depends_on: !reset []
+    command: ["python", "-m", "app.worker"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/backtestlab.db}
+      ENV: dev
+      LOG_FORMAT: text
+      LOG_LEVEL: INFO
+    volumes:
+      - ./backend/app:/srv/app
+      - ./backend/migrations:/srv/migrations
+      - ./backend/data:/srv/data
+      - ./backend/alembic.ini:/srv/alembic.ini
+      - bldata:/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: build
+    image: backtestlab/frontend-dev
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_USE_MOCK: ${VITE_USE_MOCK:-false}
+      VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
+    volumes:
+      - ./src:/app/src
+      - ./index.html:/app/index.html
+    healthcheck:
+      disable: true
+
+  # Optional PG for dev — activate with: docker compose --profile pg up
+  postgres:
+    profiles: ["pg"]
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-backtestlab}
+      POSTGRES_DB: ${POSTGRES_DB:-backtestlab}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-backtestlab} -d ${POSTGRES_DB:-backtestlab}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

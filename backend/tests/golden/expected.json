@@ -1,0 +1,24 @@
+{
+  "config": {
+    "template": "ma-crossover",
+    "params": {
+      "fastPeriod": 10,
+      "slowPeriod": 30
+    },
+    "asset": "AAPL",
+    "bars": 150,
+    "tolerance": 1e-09
+  },
+  "metrics": {
+    "final_value": 10091.168130173817,
+    "total_return": 0.009116813017381764,
+    "annual_return": 0.015363675857889003,
+    "max_drawdown": -0.0757045208282368,
+    "sharpe": 0.17719232535918797,
+    "calmar": 0.2029,
+    "sortino": 0.2544,
+    "win_rate": 0.4,
+    "trade_count": 5,
+    "benchmark_return": -0.058142
+  }
+}
